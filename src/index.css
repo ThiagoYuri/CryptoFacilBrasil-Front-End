@@ -1,13 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+/* Fontes */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;700&display=swap');
+
 body {
+  font-family: 'Inter', sans-serif;
+  background-color: #1F2937; /* Fundo Cinza Escuro */
+  color: #F3F4F6; /* Texto Cinza Claro */
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1, h2, h3 {
+  font-family: 'Poppins', sans-serif;
+  color: #F59E0B; /* Amarelo Ouro para títulos */
 }
+
+a, button {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+button.buy {
+  background-color: #10B981; /* Verde Limão */
+  color: #fff;
+}
+
+button.sell {
+  background-color: #F59E0B; /* Amarelo Ouro */
+  color: #fff;
+}
+
+button.buy:hover {
+  background-color: #059669; /* Tom mais escuro de verde */
+}
+
+button.sell:hover {
+  background-color: #D97706; /* Tom mais escuro de amarelo */
+}
+
+.alert {
+  background-color: #F97316; /* Laranja Avermelhado */
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+

@@ -11,7 +11,7 @@ const CurrencyDropdown = ({ type }) => {
       type: "buyOrSellCurrencies",
       options: [
         { code: "BTC", description: "Bitcoin", img: "bitcoin-d.svg" },
-        { code: "USD-D", description: "US Dollar Digital", img: "usd-d.svg" }
+        { code: "USDT", description: "US Dollar Digital", img: "usdt-d.svg" }
       ]
     },
     {
@@ -20,7 +20,7 @@ const CurrencyDropdown = ({ type }) => {
         { code: "BRL", description: "Brazilian Real", img: "brl.svg" },
         { code: "EUR", description: "Euro", img: "eur.svg" },
         { code: "GBP", description: "British Pound", img: "gbp.svg" },
-        { code: "USDT", description: "Tether", img: "usdt.svg" }
+        { code: "USD", description: "United States Dollar", img: "usd.svg" }
       ]
     }
   ];

@@ -4,18 +4,28 @@ import CurrencyDropdown from '../../components/CurrencyDropdown/CurrencyDropdown
 
 const Home = () => {
   const [currency, setCurrency] = useState("0,0018559"); // Valor inicial
+  const [currencyPayOrReceive, setCurrencyPayOrReceive] = useState("1"); // Valor inicial
+  const [isBuying, setIsBuying] = useState(true); // Novo estado para alternar entre comprar e vender
 
-  const handleInputChange = (event) => {
-    setCurrency(event.target.value); // Atualiza o estado com o valor do input
+  const handleInputChangeCurrency = (event) => {
+    setCurrency(event.target.value);     
+  };
+
+  const handleInputChangeCurrencyPayOrReceive = (event) => {
+    setCurrencyPayOrReceive(event.target.value);
+  };
+
+  const toggleBuySell = () => {
+    setIsBuying(!isBuying); // Alterna entre true e false
   };
 
   return (
     <div>
-      <div class="flex justify-center items-start pt-8">
-        <img src="/logo192.png" alt="Imagem centralizada" class="max-w-full h-auto" />
+      <div className="flex justify-center items-start pt-8">
+        <img src="/logo192.png" alt="Imagem centralizada" className="max-w-full h-auto" />
       </div>
 
-      <div class="max-w-sm mx-auto p-4 bg-[#ffffff05] shadow-lg rounded-lg mt-6">
+      <div className="max-w-sm mx-auto p-4 bg-[#ffffff05] shadow-lg rounded-lg mt-6">
         <form className="space-y-4">
           <div className="flex flex-col justify-center items-center space-y-4 w-full">
 
@@ -25,23 +35,25 @@ const Home = () => {
             bg-[#ffffff4d] bg-opacity-20 transition-all rounded-full">
               <div className="flex items-center space-x-2 w-full">
                 <button
-                  className="input-mode-switcher-btn select-none switcher-buy-mode text-white
-              bg-green-600 hover:bg-green-700 text-[10px] px-2 py-1 rounded-full"
+                  className={`input-mode-switcher-btn select-none text-white text-[10px] px-2 py-1 rounded-full 
+                    ${isBuying ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
                   type="button"
+                  onClick={toggleBuySell}
+                  style={{ minWidth: '70px' }} // Define uma largura mínima para manter o tamanho do botão
                 >
-                  Comprar
+                  {isBuying ? 'Comprar' : 'Vender'}
                 </button>
 
                 <input
                   className="input-currency text-center w-full bg-[#ffffff00] text-white focus:outline-none focus:border-none 
-                  h-[40px] flex items-center justify-center" // Remover bordas ao focar e garantir centralização
+                  h-[40px] flex items-center justify-center"
                   type="text"
                   value={currency}
-                  onChange={handleInputChange}
+                  onChange={handleInputChangeCurrency}
                 />
                 <div className="px-1"></div>
                 <div className="px-2">
-                  <CurrencyDropdown type={"buyOrSellCurrencies"} />
+                  <CurrencyDropdown type="buyOrSellCurrencies" />
                 </div>
               </div>
             </div>
@@ -60,14 +72,14 @@ const Home = () => {
                 </div>
                 <input
                   className="input-currency text-center w-full bg-[#ffffff00] text-white focus:outline-none focus:border-none 
-                  h-[40px] flex items-center justify-center" // Remover bordas ao focar e garantir centralização
+                  h-[40px] flex items-center justify-center"
                   type="text"
-                  value={currency}
-                  onChange={handleInputChange}
+                  value={currencyPayOrReceive}
+                  onChange={handleInputChangeCurrencyPayOrReceive}
                 />
                 <div className="px-1"></div>
                 <div className="px-2">
-                  <CurrencyDropdown type={"payOrReceiveCurrencies"} />
+                  <CurrencyDropdown type="payOrReceiveCurrencies" />
                 </div>
               </div>
             </div>

@@ -1,19 +1,132 @@
-// Home.js
-import React, { useState } from 'react';
-import CurrencyDropdown from '../../components/CurrencyDropdown/CurrencyDropdown';
+import React, { useState, useEffect, useCallback } from 'react';
+import CurrencyPopup from '../../components/CurrencyPopup/CurrencyPopup';
+import { fetchCurrencyData, convertCurrencyGlobal,convertPayOrReceiveGlobal } from '../../services/currencyService';
 
 const Home = () => {
-  const [currency, setCurrency] = useState("0,0018559"); // Valor inicial
-  const [currencyPayOrReceive, setCurrencyPayOrReceive] = useState("1"); // Valor inicial
-  const [isBuying, setIsBuying] = useState(true); // Novo estado para alternar entre comprar e vender
 
+  const [configCurrency] = useState({
+    BTC: { toFixed: 6 },
+  });
+  const [currency, setCurrency] = useState({ codeKey: "BTC", value: "" }); // Valor inicial
+  const [currencyPayOrReceive, setCurrencyPayOrReceive] = useState({ codeKey: "BRL", value: "1000" }); // Valor inicial
+  const [isBuying, setIsBuying] = useState(true); // Alternar entre comprar e vender
+  const [currencyData, setCurrencyData] = useState([]); // Dados de moeda
+
+  // Define UpdateInitCurrencies with useCallback to memoize it
+  const UpdateInitCurrencies = useCallback((data) => {
+    if (currencyPayOrReceive.value) {      
+      setCurrency((prev) => ({
+        ...prev,
+        value: convertCurrencyGlobal(
+          currencyPayOrReceive.value,
+          currencyPayOrReceive.codeKey,
+          currency.codeKey,
+          data,
+          (configCurrency[currency.codeKey]?.toFixed || 2)
+        )
+      }));
+    }
+  }, [currencyPayOrReceive.value, currencyPayOrReceive.codeKey, currency.codeKey, configCurrency]);
+
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const data = await fetchCurrencyData(); // Fetch data from API
+        setCurrencyData(data); // Save fetched currency data to state
+        UpdateInitCurrencies(data); // Update initial currencies
+      } catch (error) {
+        console.error("Erro ao buscar dados de câmbio:", error);
+      }
+    };
+  
+    fetchExchangeRate(); // Call the function on component mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array ensures it runs only once
+  
+
+  const handlePopupClose = (type, code) => {
+    // Atualiza currency
+    if(type === "buyOrSellCurrencies")
+    if (currencyPayOrReceive.value) {
+      setCurrency((prev) => ({
+        ...prev,
+        value: convertCurrencyGlobal(
+          currencyPayOrReceive.value,
+          currencyPayOrReceive.codeKey,
+          code,
+          currencyData,
+          (configCurrency[code]?.toFixed || 2)
+        )
+      }));      
+
+    }
+    if(type === "payOrReceiveCurrencies")    
+    // Atualiza currencyPayOrReceive
+    if (currency.value) {
+      setCurrencyPayOrReceive((prev) => ({
+        ...prev,
+        value: convertPayOrReceiveGlobal(
+          currency.value,
+          currency.codeKey,
+          code,
+          currencyData,
+          (configCurrency[code]?.toFixed || 2)
+        )
+      }));      
+    }
+  };
+  // Formatação do valor
+  const formatCurrency = (value) => {
+    value = value.replace(/[^0-9,/.]/g, "");
+    return value.replace(',', '.'); // Converte vírgula em ponto
+  };
+
+  // Atualiza o campo 'currency' e converte o valor
   const handleInputChangeCurrency = (event) => {
-    setCurrency(event.target.value);     
+    let value = event.target.value;
+    value = formatCurrency(value); // Formata o valor    
+    setCurrency((prev) => ({
+      ...prev,
+      value: value,
+    }));
+
+    if (currency.value) {
+      //alert(currencyPayOrReceive.codeKey)
+      setCurrencyPayOrReceive((prev) => ({
+        ...prev,
+        value: convertPayOrReceiveGlobal(
+          value,
+          currency.codeKey,
+          currencyPayOrReceive.codeKey,
+          currencyData,
+          (configCurrency[currencyPayOrReceive.codeKey]?.toFixed || 2)
+        )
+      }));
+    }
+
+
+  };
+  // Atualiza o campo 'currencyPayOrReceive' e converte o valor
+  const handleInputChangeCurrencyPayOrReceive = (event) => {
+    const value = formatCurrency(event.target.value);    
+    setCurrencyPayOrReceive((prev) => ({
+      ...prev,
+      value: value,
+    }));
+    if (currencyPayOrReceive.value) {
+      setCurrency((prev) => ({
+        ...prev,
+        value: convertCurrencyGlobal(
+          value,
+          currencyPayOrReceive.codeKey,
+          currency.codeKey,
+          currencyData,
+          (configCurrency[currency.codeKey]?.toFixed || 2)
+        )
+      }));
+    }
   };
 
-  const handleInputChangeCurrencyPayOrReceive = (event) => {
-    setCurrencyPayOrReceive(event.target.value);
-  };
 
   const toggleBuySell = () => {
     setIsBuying(!isBuying); // Alterna entre true e false
@@ -29,7 +142,7 @@ const Home = () => {
         <form className="space-y-4">
           <div className="flex flex-col justify-center items-center space-y-4 w-full">
 
-            {/* Primeira div (já está no padrão desejado) */}
+            {/* Primeira div */}
             <div className="input-currency-container cursor-text 
             flex justify-between items-center px-3 w-full max-w-xs h-[40px] 
             bg-[#ffffff4d] bg-opacity-20 transition-all rounded-full">
@@ -48,17 +161,20 @@ const Home = () => {
                   className="input-currency text-center w-full bg-[#ffffff00] text-white focus:outline-none focus:border-none 
                   h-[40px] flex items-center justify-center"
                   type="text"
-                  value={currency}
+                  value={currency.value|| ""}
                   onChange={handleInputChangeCurrency}
                 />
                 <div className="px-1"></div>
                 <div className="px-2">
-                  <CurrencyDropdown type="buyOrSellCurrencies" />
+                  <CurrencyPopup
+                    type="buyOrSellCurrencies"
+                    onClose={handlePopupClose}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Segunda div com os mesmos estilos da primeira */}
+            {/* Segunda div */}
             <div className="input-currency-container cursor-text 
             flex justify-between items-center px-3 w-full max-w-xs h-[40px] 
             bg-[#ffffff4d] bg-opacity-20 transition-all rounded-full">
@@ -74,12 +190,15 @@ const Home = () => {
                   className="input-currency text-center w-full bg-[#ffffff00] text-white focus:outline-none focus:border-none 
                   h-[40px] flex items-center justify-center"
                   type="text"
-                  value={currencyPayOrReceive}
+                  value={currencyPayOrReceive.value|| ""}
                   onChange={handleInputChangeCurrencyPayOrReceive}
                 />
                 <div className="px-1"></div>
                 <div className="px-2">
-                  <CurrencyDropdown type="payOrReceiveCurrencies" />
+                  <CurrencyPopup
+                    type="payOrReceiveCurrencies"
+                    onClose={handlePopupClose}
+                  />
                 </div>
               </div>
             </div>
